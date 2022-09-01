@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { ReactDOM } from 'react-dom';
 import PropTypes from 'prop-types';
+import { CSSTransition, TransitionGroup } from 'react-transition-group'
 
 import useMarvelService from '../../services/MarvelService';
 import Spinner from '../spinner/spinner';
@@ -20,6 +21,7 @@ const CharList = (props) => {
    useEffect(() => {
       onLoad(offset, true);
    }, [])
+
 
    const onLoad = (offset, initial) => {
       initial ? setNewItemLoading(false) : setNewItemLoading(true)
@@ -54,46 +56,51 @@ const CharList = (props) => {
             imgStyle = { 'objectFit': 'unset' };
          }
          return (
-            <li
-               tabIndex={0}
-               ref={el => itemRefs.current[i] = el}
-               className="char__item"
+            <CSSTransition
                key={id}
-               onClick={() => {
-                  props.onCharSelected(id);
-                  onFocus(i)
-               }}
-               onKeyDown={(e) => {
-                  if (e.key === " " || e.key === "Enter") {
+               timeout={400}
+               classNames='char__item'>
+               <li
+                  tabIndex={0}
+                  ref={el => itemRefs.current[i] = el}
+                  className="char__item"
+                  onClick={() => {
                      props.onCharSelected(id);
                      onFocus(i)
-                  }
-               }}>
-               <img src={thumbnail} alt="abyss" style={imgStyle} />
-               <div className="char__name">{name}</div>
+                  }}
+                  onKeyDown={(e) => {
+                     if (e.key === " " || e.key === "Enter") {
+                        props.onCharSelected(id);
+                        onFocus(i)
+                     }
+                  }}>
+                  <img src={thumbnail} alt="abyss" style={imgStyle} />
+                  <div className="char__name">{name}</div>
 
-            </li>
+               </li>
+            </CSSTransition>
          )
       })
       return (
-         <ul className="char__grid">
+         <TransitionGroup component={'ul'} className="char__grid">
             {charasters}
-         </ul>
+         </TransitionGroup>
       )
    }
 
    const spinner = loading && !newItemLoading ? <Spinner /> : null
    const errorMessage = error ? <ErrorMessage /> : null
-   const content = errorMessage || spinner || RenderCharList(charList)
+   const content = errorMessage || spinner
+   const items = RenderCharList(charList)
 
    return (
       <div className="char__list">
          {content}
-
+         {items}
          <button className="button button__main button__long"
             disabled={newItemLoading}
             style={{ "display": charEnded ? "none" : 'block' }}
-            onClick={onLoad}>
+            onClick={() => onLoad(offset)}>
             <div className="inner">load more</div>
          </button>
       </div>

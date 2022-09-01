@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom';
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
 import useMarvelService from '../../services/MarvelService';
 import Spinner from '../spinner/spinner';
@@ -41,30 +42,38 @@ const ComicsList = () => {
          const { id, title, thumbnail, price } = comic
 
          return (
-            <li className="comics__item"
-               key={i}>
-               <Link to={`/comics/${id}`}>
-                  <img src={thumbnail} alt="ultimate war" className="comics__item-img" />
-                  <div className="comics__item-name">{title}</div>
-                  <div className="comics__item-price">{price}</div>
-               </Link>
-            </li>
+            <CSSTransition
+               key={i}
+               timeout={400}
+               classNames="comics__item">
+               <li className="comics__item">
+                  <Link to={`/comics/${id}`}>
+                     <img src={thumbnail} alt="ultimate war" className="comics__item-img" />
+                     <div className="comics__item-name">{title}</div>
+                     <div className="comics__item-price">{price}</div>
+                  </Link>
+               </li>
+            </CSSTransition>
+
          )
       })
       return (
-         <ul className="comics__grid">
+         <TransitionGroup component={'ul'} className="comics__grid">
             {comicsList}
-         </ul>
+         </TransitionGroup>
+
       )
    }
 
    const spinner = loading && !newItemLoading ? <Spinner /> : null
    const errorMessage = error ? <ErrorMessage /> : null
-   const content = errorMessage || spinner || renderComics(comics);
+   const content = errorMessage || spinner;
+   const items = renderComics(comics)
 
    return (
       <div className="comics__list">
          {content}
+         {items}
          <button className="button button__main button__long"
             disabled={newItemLoading}
             style={{ "display": comicEnded ? "none" : 'block' }}
