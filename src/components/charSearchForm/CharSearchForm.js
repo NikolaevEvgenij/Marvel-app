@@ -41,7 +41,7 @@ const CharSearchForm = () => {
             </Link>
          </div>
    }
-   else if (char == '') {
+   else if (char === '') {
       results =
          <div className="char__search-error">
             The character was not found. Check the name and try again
