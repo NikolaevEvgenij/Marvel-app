@@ -4,16 +4,14 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 
 import useMarvelService from '../../services/MarvelService';
-import Spinner from '../spinner/spinner';
-import ErrorMessage from '../errorMessage/errorMessage';
-import Skeleton from "../skeleton/Skeleton"
+import setContent from '../../utils/setContent';
 
 import './charInfo.scss';
 
 const CharInfo = (props) => {
    const [char, setChar] = useState(null)
 
-   const { loading, error, getCharacter } = useMarvelService();
+   const { process, setProcess, getCharacter } = useMarvelService();
 
    const onCharLoaded = (char) => {
       setChar(char);
@@ -27,28 +25,23 @@ const CharInfo = (props) => {
       }
       getCharacter(charId)
          .then(onCharLoaded)
+         .then(() => setProcess('confirmed'))
    }
 
    useEffect(() => {
       updateChar();
    }, [props.charId])
 
-
-   const skeleton = loading || char || error ? null : <Skeleton />
-   const spinner = loading ? <Spinner /> : null
-   const errorMessage = error ? <ErrorMessage /> : null
-   const content = skeleton || errorMessage || spinner || <View char={char} />
-
    return (
       <div className="char__info">
-         {content}
+         {setContent(process, View, char)}
       </div>
    )
 
 }
 
-const View = ({ char }) => {
-   const { name, description, thumbnail, homepage, wiki, comics } = char
+const View = ({ data }) => {
+   const { name, description, thumbnail, homepage, wiki, comics } = data
 
    let renderComics = 'There are no comics for this character'
 

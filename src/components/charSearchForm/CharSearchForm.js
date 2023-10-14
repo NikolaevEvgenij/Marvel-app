@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import useMarvelService from '../../services/MarvelService'
 import ErrorMessage from '../errorMessage/errorMessage';
 
+
 import './charSearchForm.scss'
 
 
@@ -13,10 +14,9 @@ const CharSearchForm = () => {
 
    const [char, setChar] = useState(null)
 
-   const { loading, error, getCharacterByName, clearError } = useMarvelService();
+   const { getCharacterByName, clearError, process, setProcess } = useMarvelService();
 
    const onCharLoaded = (char) => {
-
       setChar(char);
    }
 
@@ -24,11 +24,11 @@ const CharSearchForm = () => {
       clearError();
 
       getCharacterByName(name)
-         .then(onCharLoaded);
+         .then(onCharLoaded)
+         .then(() => setProcess('confirmed'))
    }
 
-   const errorMessage = error ? <div className="char__search-critical-error"><ErrorMessage /></div> : null;
-
+   const errorMessage = process === 'error' ? <div className="char__search-critical-error"><ErrorMessage /></div> : null;
 
    let results = null
 
@@ -49,17 +49,7 @@ const CharSearchForm = () => {
    } else {
       results = null;
    }
-   // const results = !char ? null : char.length > 0 ?
-   //    <div className="char__search-error">
-   //       The character was not found. Check the name and try again
-   //    </div> :
-   //    <div className="char__search-wrapper">
-   //       <div className="char__search-success">There is! Visit {char.name} page?</div>
-   //       <Link to={`/characters/${char.id}`} className="button button__secondary">
-   //          <div className="inner">To page</div>
-   //       </Link>
-   //    </div>;
-   console.log(char)
+
    return (
       <div className="char__search-form">
          <Formik
@@ -85,7 +75,7 @@ const CharSearchForm = () => {
                   <button
                      type='submit'
                      className="button button__main"
-                     disabled={loading}>
+                     disabled={process === 'loading'}>
                      <div className="inner">find</div>
                   </button>
                </div>
